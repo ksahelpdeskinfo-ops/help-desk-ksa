@@ -71,6 +71,9 @@ export function Hero({ onSearch }: HeroProps) {
         }),
       });
 
+      if (!res.ok) {
+        throw new Error(`Server Error: ${res.status}`);
+      }
       const data = await res.json();
 
       if (data.reply) {
@@ -87,11 +90,11 @@ export function Hero({ onSearch }: HeroProps) {
           setMessages(prev => [...prev, { role: "error", content: errorMessage }]);
         }
       }
-    } catch (err) {
+    } catch (err: any) {
       console.log("Chat API failed:", err);
       setMessages(prev => [...prev, { 
         role: "error", 
-        content: t('hero_network_error') 
+        content: `${t('hero_network_error')} (${err.message})`
       }]);
     } finally {
       setIsLoading(false);
