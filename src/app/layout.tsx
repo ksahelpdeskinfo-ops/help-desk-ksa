@@ -12,12 +12,31 @@ import Script from "next/script";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://helpdesk.linux-aios.com'),
   title: {
-    default: "Saudi Workers Guide | Labor Law & Expat Rights KSA",
-    template: "%s | Saudi Workers Guide"
+    default: "Help Desk KSA | Labor Law, Iqama & Expat Guide",
+    template: "%s | Help Desk KSA"
   },
-  description: "The definitive guide to Saudi Arabia labor law, work permits, iqama renewals, and end-of-service benefits for expatriates in Saudi Arabia.",
-  keywords: ["Saudi Arabia labor law", "Saudi workers guide", "Iqama renewal online", "EOSB calculator Saudi", "worker rights KSA"],
+  description: "Official guide to Saudi Arabia labor law, work permits, iqama renewals, and end-of-service benefits. Your interactive community for KSA expat life.",
+  keywords: ["Saudi Arabia labor law", "Iqama renewal", "KSA Labor Law", "Saudi Expat Guide", "EOSB Calculator KSA", "Saudi Labor Office", "Help Desk KSA"],
+  authors: [{ name: "Help Desk KSA Team" }],
+  openGraph: {
+    title: "Help Desk KSA | The Ultimate Saudi Expat Resource",
+    description: "Expert guidance on Saudi Labor Law, Visas, and Expat life. Real-time community support.",
+    url: "https://helpdesk.linux-aios.com",
+    siteName: "Help Desk KSA",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Help Desk KSA | Saudi Expat Guide",
+    description: "Expert guidance on Saudi Labor Law and Expat life.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  }
 };
 
 export default function RootLayout({
