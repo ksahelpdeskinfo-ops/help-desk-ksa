@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>HelpDesk KSA — Public Help & Q&A</title>
+<style>
+/* --- Basic Body & Font --- */
+body {
+  margin: 0;
+  font-family: "Inter", Arial, sans-serif;
+  background: #f5f7fa;
+  color: #1a1a1a;
+}
+
+/* --- Header --- */
+header {
+  background: #0a5c36;
+  color: white;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+}
+.logo { font-size: 22px; font-weight: 700; }
+nav a {
+  margin-left: 25px;
+  color: white;
+  font-size: 16px;
+  font-weight: 500;
+  text-decoration: none;
+}
+nav a:hover { color: #c9ffdd; }
+
+/* --- Hero Section --- */
+.hero {
+  background: linear-gradient(135deg,#0b6a40,#13844c);
+  padding: 60px 20px;
+  color: white;
+  text-align: center;
+}
+.hero h1 { font-size: 42px; margin-bottom: 10px; font-weight: 800; }
+.hero p { font-size: 18px; opacity: 0.9; max-width: 600px; margin: auto; }
+.search-box {
+  margin: 30px auto 0;
+  max-width: 600px;
+  background: white;
+  padding: 10px;
+  border-radius: 50px;
+  display: flex;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+.search-box input {
+  flex: 1;
+  border: none;
+  padding: 12px;
+  font-size: 16px;
+  outline: none;
+}
+.search-box button {
+  background: #0a5c36;
+  color: white;
+  padding: 12px 24px;
+  border-radius: 50px;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
+}
+.search-box button:hover { background: #128248; }
+
+/* --- Cards --- */
+.cards, .qa-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit,minmax(260px,1fr));
+  gap: 25px;
+  padding: 40px 30px;
+}
+.card, .qa-card {
+  background: white;
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  transition: 0.3s;
+  border: 1px solid #e9e9e9;
+}
+.card:hover, .qa-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+.card h3, .qa-card h3 { margin-bottom: 10px; font-size: 20px; }
+.card p, .qa-card p { opacity: 0.8; font-size: 15px; line-height: 1.4; }
+
+/* --- Section Titles --- */
+.section-title { text-align:center; font-size:28px; font-weight:700; margin-top:50px; margin-bottom:30px; }
+
+/* --- Forms --- */
+.contact-form, .qa-form {
+  max-width: 500px;
+  margin: 40px auto;
+  padding: 25px;
+  background: #f0fdf4;
+  border-radius: 12px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+.contact-form h2, .qa-form h2 { text-align:center; color:#0f5132; margin-bottom:20px; }
+.contact-form label, .qa-form label {
+  display: block;
+  margin-bottom: 10px;
+  color: #0f5132;
+  font-weight: bold;
+}
+.contact-form input, .contact-form textarea, .qa-form input, .qa-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 5px;
+  border: 1px solid #0f5132;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.contact-form button, .qa-form button {
+  width: 100%;
+  padding: 12px;
+  background: #198754;
+  color: #fff;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+.contact-form button:hover, .qa-form button:hover { background: #0f5132; }
+
+/* --- Language Switch --- */
+.lang-switch { text-align:center; margin:20px 0; }
+.lang-switch button {
+  margin:0 5px;
+  padding:8px 15px;
+  border:none;
+  border-radius:6px;
+  background:#128248;
+  color:white;
+  cursor:pointer;
+  transition:0.3s;
+}
+.lang-switch button:hover { background:#0a5c36; }
+
+/* --- Footer --- */
+footer {
+  background:#0a5c36;
+  padding:40px;
+  margin-top:40px;
+  color:white;
+  text-align:center;
+  font-size:15px;
+}
+.ad-slot { margin:25px auto; text-align:center; }
+
+/* --- Responsive Adjustments --- */
+@media(max-width:600px){
+  header { flex-direction: column; gap: 15px; text-align:center; }
+  nav a { margin: 0 10px; }
+}
+</style>
+
+<!-- Google Adsense -->
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+
+<!-- Google Sheets JSON -->
+<script>
+const SHEET_JSON_URL = "https://opensheet.elk.sh/12AW97hvs-KUb-Uud356YAsvOQUvuIWtyrpImwKbMiks/Sheet1";
+</script>
+</head>
+<body>
+
+<header>
+  <div class="logo">🇸🇦 HelpDesk KSA</div>
+  <nav>
+    <a href="#">Home</a>
+    <a href="#ask">Ask Question</a>
+    <a href="#qa">Public Q&A</a>
+    <a href="#contact">Contact</a>
+  </nav>
+</header>
+
+<section class="hero">
+  <h1>Your Trusted Help Desk in KSA</h1>
+  <p>Submit questions and browse answers from other users for guidance on labour, HR, and general help.</p>
+  
+  <div class="search-box">
+    <input type="text" placeholder="Search: Salary, Visa, Iqama, Absher..." />
+    <button>Search</button>
+  </div>
+
+  <!-- Hero Ad -->
+  <div class="ad-slot">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-xxxxxxxxxx"
+         data-ad-slot="1111111111"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+</section>
+
+<h2 class="section-title">How We Help</h2>
+<div class="cards">
+  <div class="card"><h3>General Labour Help</h3><p>Understand basic procedures like transfer, exit re-entry, contract terms, violations, and more.</p></div>
+  <div class="card"><h3>Salary & HR Guidance</h3><p>Non-legal guidance on salary delays, deductions, end-of-service, vacation, and employer obligations.</p></div>
+  <div class="card"><h3>Expatriate Support</h3><p>Help for Indian, Pakistani, Bangladeshi, Nepali, Filipino, Sri Lankan workers in KSA.</p></div>
+  
+  <div class="ad-slot">
+    <ins class="adsbygoogle"
+         style="display:block"
+         data-ad-client="ca-pub-xxxxxxxxxx"
+         data-ad-slot="2222222222"
+         data-ad-format="auto"
+         data-full-width-responsive="true"></ins>
+    <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+  </div>
+
+  <div class="card"><h3>Email-Based Private Support</h3><p>Send your issue privately at <b>ksa.helpdesk.info@gmail.com</b>. We reply within 24 hours.</p></div>
+  <div class="card"><h3>Public Q&A</h3><p>Browse questions asked by others. Learn solutions, advice, and guidance based on KSA rules.</p></div>
+  <div class="card"><h3>Partnerships</h3><p>Promote your legal services, travel agency, HR company, or shop on our website.</p></div>
+</div>
+
+<div id="ask" class="qa-form">
+  <h2>Ask a Question</h2>
+  <form id="questionForm">
+    <label>Your Name:<input type="text" name="name" required></label>
+    <label>Your Email:<input type="email" name="email" required></label>
+    <label>Your Question:<textarea name="question" rows="5" required></textarea></label>
+    <button type="submit">Submit Question</button>
+  </form>
+</div>
+
+<h2 class="section-title" id="qa">Public Q&A</h2>
+<div class="qa-cards" id="qaCards">
+  <p style="text-align:center;opacity:0.7;">Loading approved questions...</p>
+</div>
+
+<div id="contact" class="contact-form">
+  <h2>Contact Helpdesk KSA</h2>
+  <form action="https://formspree.io/f/xwpyvkzv" method="POST">
+    <label>Your Name:<input type="text" name="name" required></label>
+    <label>Your Email:<input type="email" name="email" required></label>
+    <label>Your Message:<textarea name="message" rows="5" required></textarea></label>
+    <button type="submit">Send Message</button>
+  </form>
+</div>
+
+<div class="lang-switch">
+  <button onclick="switchLang('en')">English</button>
+  <button onclick="switchLang('hi')">Hindi</button>
+  <button onclick="switchLang('ar')">Arabic</button>
+  <button onclick="switchLang('ur')">Urdu</button>
+</div>
+
+<div class="ad-slot">
+  <ins class="adsbygoogle"
+       style="display:block"
+       data-ad-client="ca-pub-xxxxxxxxxx"
+       data-ad-slot="3333333333"
+       data-ad-format="auto"
+       data-full-width-responsive="true"></ins>
+  <script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
+
+<footer>
+  © 2025 HelpDesk KSA — All Rights Reserved<br>
+  ⚠️ Disclaimer: Free guidance only. Not legal advice. Information provided for general purposes only.
+</footer>
+
+<script>
+// Language switch placeholder
+function switchLang(lang){ alert("Language switched to: " + lang); }
+
+// Q&A Submission
+document.getElementById("questionForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  alert("Your question has been submitted! It will appear once approved."); 
+});
+
+// Fetch Approved Q&A from Google Sheets JSON
+async function loadQA(){
+  try {
+    const res = await fetch(SHEET_JSON_URL);
+    const data = await res.json();
+    const qaContainer = document.getElementById("qaCards");
+    qaContainer.innerHTML = "";
+    data.forEach(row => {
+      if(row.Approved && row.Approved.toLowerCase() === "yes"){
+        const card = document.createElement("div");
+        card.className = "qa-card";
+        card.innerHTML = `<h3>${row.Question}</h3><p><b>Answer:</b> ${row.Answer}</p>`;
+        qaContainer.appendChild(card);
+      }
+    });
+  } catch(err){
+    console.error("Error loading Q&A:", err);
+    document.getElementById("qaCards").innerHTML = "<p style='text-align:center;opacity:0.7;'>Failed to load questions.</p>";
+  }
+}
+loadQA();
+</script>
+
+</body>
+</html>
