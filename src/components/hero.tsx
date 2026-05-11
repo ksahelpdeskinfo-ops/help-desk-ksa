@@ -83,7 +83,8 @@ export function Hero({ onSearch }: HeroProps) {
             content: t('hero_offline') 
           }]);
         } else {
-          setMessages(prev => [...prev, { role: "error", content: data.error }]);
+          const errorMessage = data.details || data.error;
+          setMessages(prev => [...prev, { role: "error", content: errorMessage }]);
         }
       }
     } catch (err) {

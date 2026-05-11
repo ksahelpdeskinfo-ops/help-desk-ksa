@@ -4,7 +4,10 @@ import { NextResponse } from "next/server";
 export async function POST(req: Request) {
   const apiKey = process.env.GROQ_API_KEY;
   
+  console.log("Chat API Request received. Key Present:", !!apiKey);
+
   if (!apiKey || apiKey.includes("your_")) {
+    console.error("Missing or invalid GROQ_API_KEY");
     return NextResponse.json({ error: "Groq API key not configured correctly" }, { status: 500 });
   }
 
@@ -12,6 +15,7 @@ export async function POST(req: Request) {
 
   try {
     const { messages } = await req.json();
+    console.log("Messages received count:", messages?.length);
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Invalid messages format" }, { status: 400 });
@@ -32,7 +36,7 @@ Rules:
 
     const chatCompletion = await groq.chat.completions.create({
       messages: [systemPrompt, ...messages],
-      model: "llama-3.3-70b-versatile",
+      model: "llama-3.1-8b-instant",
       temperature: 0.5,
       max_tokens: 1024,
     });
