@@ -1,7 +1,11 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { MessageSquare, Users, Send, Share2, MessageCircle, MoreHorizontal, ShieldCheck, LogIn, ChevronDown, Flag, LogOut, RefreshCw, AlertTriangle } from "lucide-react";
+import { 
+  MessageSquare, Users, Send, Share2, MessageCircle, MoreHorizontal, 
+  ShieldCheck, LogIn, ChevronDown, Flag, LogOut, RefreshCw, AlertTriangle,
+  Bold, Italic, Underline, Heading1, Heading2, Image, ImageIcon 
+} from "lucide-react";
 import { useLanguage } from "@/context/language-context";
 import { supabase } from "@/lib/supabase";
 
@@ -35,8 +39,107 @@ export default function CommunityChatPage() {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
 
   const categories = ["All", "Labor Law", "Visa & Iqama", "Jobs & Careers", "General Discussion"];
+
+  // Helper to safely render formatted text (Bold, Italic, Underline)
+  const renderContent = (text: string) => {
+    if (!text) return null;
+    // Replace # header, ## header, image, link, **bold**, *italic*, __underline__
+    const formatted = text
+      .replace(/^# (.*?)$/gm, '<h1 class="text-2xl font-bold mb-4 mt-2">$1</h1>')
+      .replace(/^## (.*?)$/gm, '<h2 class="text-xl font-bold mb-3 mt-2">$1</h2>')
+      .replace(/!\[(.*?)\]\((.*?)\)/g, '<img src="$2" alt="$1" class="rounded-xl border border-slate-200 my-4 max-h-[400px] object-cover w-full" />')
+      .replace(/(https?:\/\/[^\s!]+)/g, (url) => {
+        // Don't wrap images in <a> tags
+        if (url.match(/\.(jpeg|jpg|gif|png|svg)$/) || url.includes('supabase.co/storage/v1/object/public/post-images')) return url;
+        return `<a href="${url}" target="_blank" rel="noopener noreferrer" class="text-blue-600 hover:underline break-all">${url}</a>`;
+      })
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>')
+      .replace(/__(.*?)__/g, '<u>$1</u>');
+    
+    return <div 
+      className="whitespace-pre-wrap break-words" 
+      dangerouslySetInnerHTML={{ __html: formatted }} 
+    />;
+  };
+
+  const handleInputResize = (e: any) => {
+    e.target.style.height = 'auto';
+    e.target.style.height = `${e.target.scrollHeight}px`;
+  };
+
+  const applyFormatting = (type: 'bold' | 'italic' | 'underline' | 'h1' | 'h2', isReply: boolean = false) => {
+    const textarea = document.getElementById(isReply ? 'reply-textarea' : 'post-textarea') as HTMLTextAreaElement;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const text = textarea.value;
+    const selectedText = text.substring(start, end);
+    
+    let formatted = "";
+    if (type === 'bold') formatted = `**${selectedText}**`;
+    if (type === 'italic') formatted = `*${selectedText}*`;
+    if (type === 'underline') formatted = `__${selectedText}__`;
+    if (type === 'h1') formatted = `\n# ${selectedText}`;
+    if (type === 'h2') formatted = `\n## ${selectedText}`;
+
+    const newText = text.substring(0, start) + formatted + text.substring(end);
+    
+    if (isReply) {
+      setReplyContent(newText);
+    } else {
+      setNewPostContent(newText);
+    }
+    
+    // Reset focus
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start + formatted.length, start + formatted.length);
+    }, 0);
+  };
+
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, isReply: boolean = false) => {
+    const file = e.target.files?.[0];
+    if (!file || !supabase) return;
+
+    if (!file.type.startsWith('image/')) {
+      alert("Please upload an image file.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('post-images')
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from('post-images')
+        .getPublicUrl(filePath);
+
+      const imageMarkdown = `\n![image](${publicUrl})\n`;
+      
+      if (isReply) {
+        setReplyContent(prev => prev + imageMarkdown);
+      } else {
+        setNewPostContent(prev => prev + imageMarkdown);
+      }
+    } catch (err: any) {
+      alert("Error uploading image: " + err.message);
+    } finally {
+      setIsUploading(false);
+    }
+  };
 
   useEffect(() => {
     if (!supabase) return;
@@ -242,11 +345,68 @@ export default function CommunityChatPage() {
                   className="w-full bg-slate-50 rounded-lg border border-slate-100 px-4 py-2 text-sm mb-3 focus:outline-none focus:ring-2 focus:ring-[#006C35]/20 font-bold"
                   disabled={!user || isSubmitting}
                 />
+                <div className="flex items-center gap-2 mb-2">
+                  <button 
+                    onClick={() => applyFormatting('bold')}
+                    className="p-1.5 hover:bg-slate-100 rounded text-slate-600 transition-colors"
+                    title="Bold"
+                  >
+                    <Bold size={14} />
+                  </button>
+                  <button 
+                    onClick={() => applyFormatting('italic')}
+                    className="p-1.5 hover:bg-slate-100 rounded text-slate-600 transition-colors"
+                    title="Italic"
+                  >
+                    <Italic size={14} />
+                  </button>
+                  <button 
+                    onClick={() => applyFormatting('underline')}
+                    className="p-1.5 hover:bg-slate-100 rounded text-slate-600 transition-colors"
+                    title="Underline"
+                  >
+                    <Underline size={14} />
+                  </button>
+                  <div className="w-px h-4 bg-slate-200 mx-1"></div>
+                  <button 
+                    onClick={() => applyFormatting('h1')}
+                    className="p-1.5 hover:bg-slate-100 rounded text-slate-600 transition-colors"
+                    title="Large Title"
+                  >
+                    <Heading1 size={14} />
+                  </button>
+                  <button 
+                    onClick={() => applyFormatting('h2')}
+                    className="p-1.5 hover:bg-slate-100 rounded text-slate-600 transition-colors"
+                    title="Medium Title"
+                  >
+                    <Heading2 size={14} />
+                  </button>
+                  <div className="w-px h-4 bg-slate-200 mx-1"></div>
+                  <button 
+                    onClick={() => document.getElementById('post-image-input')?.click()}
+                    disabled={isUploading}
+                    className="p-1.5 hover:bg-slate-100 rounded text-slate-600 transition-colors flex items-center gap-1"
+                    title="Upload Image"
+                  >
+                    {isUploading ? <RefreshCw size={14} className="animate-spin" /> : <ImageIcon size={14} />}
+                  </button>
+                  <input 
+                    id="post-image-input"
+                    type="file"
+                    accept="image/*"
+                    onChange={(e) => handleFileUpload(e)}
+                    className="hidden"
+                  />
+                  <span className="text-[10px] text-slate-400 ml-2">Tip: Use # for large text</span>
+                </div>
                 <textarea
+                  id="post-textarea"
                   placeholder={t('community_post_placeholder')}
                   value={newPostContent}
                   onChange={(e) => setNewPostContent(e.target.value)}
-                  className="w-full bg-slate-50 rounded-xl border border-slate-100 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#006C35]/20 transition-all resize-none min-h-[100px]"
+                  onInput={handleInputResize}
+                  className="w-full bg-slate-50 rounded-xl border border-slate-100 p-4 text-sm focus:outline-none focus:ring-2 focus:ring-[#006C35]/20 transition-all resize-none min-h-[100px] overflow-hidden"
                   disabled={!user || isSubmitting}
                 />
                 <div className="flex items-center justify-between mt-4">
@@ -299,9 +459,9 @@ export default function CommunityChatPage() {
                   <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[#006C35] transition-colors">
                     {thread.title}
                   </h3>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6 font-light">
-                    {thread.content}
-                  </p>
+                  <div className="text-slate-600 text-sm leading-relaxed mb-6 font-light">
+                    {renderContent(thread.content)}
+                  </div>
 
                   <div className="flex items-center gap-6 pt-4 border-t border-slate-50">
                     <button 
@@ -325,11 +485,35 @@ export default function CommunityChatPage() {
                          {user ? <img src={user.user_metadata.avatar_url} alt="me" /> : <Users className="text-slate-400" size={16} />}
                       </div>
                       <div className="flex-1">
+                        <div className="flex items-center gap-1 mb-1">
+                          <button onClick={() => applyFormatting('bold', true)} className="p-1 hover:bg-slate-200 rounded text-slate-500"><Bold size={12}/></button>
+                          <button onClick={() => applyFormatting('italic', true)} className="p-1 hover:bg-slate-200 rounded text-slate-500"><Italic size={12}/></button>
+                          <button onClick={() => applyFormatting('underline', true)} className="p-1 hover:bg-slate-200 rounded text-slate-500"><Underline size={12}/></button>
+                          <button onClick={() => applyFormatting('h1', true)} className="p-1 hover:bg-slate-200 rounded text-slate-500"><Heading1 size={12}/></button>
+                          <button onClick={() => applyFormatting('h2', true)} className="p-1 hover:bg-slate-200 rounded text-slate-500"><Heading2 size={12}/></button>
+                          <div className="w-px h-3 bg-slate-200 mx-1"></div>
+                          <button 
+                            onClick={() => document.getElementById('reply-image-input')?.click()}
+                            disabled={isUploading}
+                            className="p-1 hover:bg-slate-200 rounded text-slate-500"
+                          >
+                            {isUploading ? <RefreshCw size={12} className="animate-spin" /> : <ImageIcon size={12} />}
+                          </button>
+                          <input 
+                            id="reply-image-input"
+                            type="file"
+                            accept="image/*"
+                            onChange={(e) => handleFileUpload(e, true)}
+                            className="hidden"
+                          />
+                        </div>
                         <textarea 
+                          id="reply-textarea"
                           placeholder="Write a reply..."
                           value={replyContent}
                           onChange={(e) => setReplyContent(e.target.value)}
-                          className="w-full bg-slate-50 rounded-xl border border-slate-100 p-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#006C35] transition-all resize-none min-h-[60px]"
+                          onInput={handleInputResize}
+                          className="w-full bg-slate-50 rounded-xl border border-slate-100 p-3 text-xs focus:outline-none focus:ring-1 focus:ring-[#006C35] transition-all resize-none min-h-[60px] overflow-hidden"
                           disabled={!user || isSubmitting}
                         />
                         <div className="flex justify-end mt-2">
@@ -358,9 +542,9 @@ export default function CommunityChatPage() {
                               <span className="text-xs font-bold text-slate-900">{reply.author_name}</span>
                               <span className="text-[10px] text-slate-400">{new Date(reply.created_at).toLocaleDateString()}</span>
                             </div>
-                            <p className="text-xs text-slate-600 leading-relaxed font-light">
-                              {reply.content}
-                            </p>
+                            <div className="text-xs text-slate-600 leading-relaxed font-light">
+                              {renderContent(reply.content)}
+                            </div>
                           </div>
                         </div>
                       ))}

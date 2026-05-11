@@ -2,11 +2,34 @@
 
 import { 
   ShieldCheck, Clock, MapPin, Building2, PhoneCall, Globe, 
-  Briefcase, Users, FileText, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, DollarSign, Landmark, GraduationCap, Compass, Heart, Star
+  Briefcase, Users, FileText, CheckCircle2, AlertCircle, ChevronDown, ChevronUp, DollarSign, Landmark, GraduationCap, Compass, Heart, Star, RefreshCw
 } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function GuideLibraryPage() {
+  const [dynamicGuides, setDynamicGuides] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchDynamicGuides();
+  }, []);
+
+  const fetchDynamicGuides = async () => {
+    if (!supabase) return;
+    const { data, error } = await supabase
+      .from("guides")
+      .select("*")
+      .order("created_at", { ascending: false });
+    
+    if (data) setDynamicGuides(data);
+    setLoading(false);
+  };
+
+  const getDynamicGuidesByCategory = (category: string) => {
+    return dynamicGuides.filter(g => g.category === category);
+  };
   return (
     <div className="bg-slate-50 min-h-screen pb-24">
       {/* Hero Header */}
@@ -41,6 +64,9 @@ export default function GuideLibraryPage() {
               <ServiceItem title="Sponsor Transfer (Qiwa)" desc="Tracking your transfer request and legal requirements." href="/sponsor-transfer-status-saudi" />
               <ServiceItem title="Profession Change" desc="Rules for updating your job title in the labor system." href="/work-permits-saudi-arabia" />
               <ServiceItem title="SIM Cards for Expats" desc="How to check mobile numbers registered on your Iqama." href="/sim-cards-iqama-check" />
+              {getDynamicGuidesByCategory("Work & Visa System").map(guide => (
+                <ServiceItem key={guide.id} title={guide.title} desc={guide.description} href={guide.href} isDynamic />
+              ))}
             </div>
           </section>
 
@@ -56,6 +82,9 @@ export default function GuideLibraryPage() {
               <ServiceItem title="GOSI Contributions" desc="Guide to social insurance records and calculation." href="/salary-certificate-download" />
               <ServiceItem title="Wage Protection System" desc="Monitoring your salary payments and reporting delays." href="/labor-office" />
               <ServiceItem title="Labor Complaints" desc="Filing official complaints for delayed or unpaid salaries." href="/labor-complaints-saudi-arabia" />
+              {getDynamicGuidesByCategory("Salary & Finance").map(guide => (
+                <ServiceItem key={guide.id} title={guide.title} desc={guide.description} href={guide.href} isDynamic />
+              ))}
             </div>
           </section>
 
@@ -70,6 +99,9 @@ export default function GuideLibraryPage() {
               <ServiceItem title="Healthcare for Expats" desc="Mandatory health insurance rules, hospital access, and medical costs." href="/healthcare-guide-saudi" />
               <ServiceItem title="Public Holidays" desc="Official calendar guide for religious and national holidays in KSA." href="/public-holidays-saudi" />
               <ServiceItem title="Hajj & Statutory Leave" desc="Understanding eligibility, paid leave duration, and legal rights." href="/leave-rules-saudi-arabia" />
+              {getDynamicGuidesByCategory("Life & Rights").map(guide => (
+                <ServiceItem key={guide.id} title={guide.title} desc={guide.description} href={guide.href} isDynamic />
+              ))}
             </div>
           </section>
 
@@ -87,6 +119,9 @@ export default function GuideLibraryPage() {
               <ServiceItem title="Child Vaccination Rules" desc="Mandatory health requirements for school and residency." href="/child-vaccination-rules-saudi" />
               <ServiceItem title="University Admissions" desc="Higher education pathways and requirements for expats." href="/university-admissions-saudi" />
               <ServiceItem title="Nursery & Daycare" desc="Early childhood care, safety, and licensed facilities." href="/nursery-daycare-guide-saudi" />
+              {getDynamicGuidesByCategory("Family & Education").map(guide => (
+                <ServiceItem key={guide.id} title={guide.title} desc={guide.description} href={guide.href} isDynamic />
+              ))}
             </div>
           </section>
 
@@ -103,6 +138,9 @@ export default function GuideLibraryPage() {
               <ServiceItem title="Airport Travel Rules" desc="Essential documentation and customs rules for travelers." href="/airport-travel-rules-saudi" />
               <ServiceItem title="Saudi Tourism Visa" desc="Guide to eVisa system and Umrah visitor permits." href="/saudi-tourism-visa-guide" />
               <ServiceItem title="GCC Travel Guide" desc="Mobility and visa rules for traveling within the Gulf." href="/gcc-travel-guide-saudi" />
+              {getDynamicGuidesByCategory("Travel & Tourism").map(guide => (
+                <ServiceItem key={guide.id} title={guide.title} desc={guide.description} href={guide.href} isDynamic />
+              ))}
             </div>
           </section>
 
@@ -119,6 +157,9 @@ export default function GuideLibraryPage() {
               <ServiceItem title="Prayer Timings" desc="Daily schedules, official timing systems, and mosque access." href="/prayer-timings-saudi-arabia" />
               <ServiceItem title="Islamic Holidays" desc="Eid al-Fitr, Eid al-Adha, and official vacation regulations." href="/islamic-holidays-saudi" />
               <ServiceItem title="Expat Community Centers" desc="Social networks, embassy services, and family support groups." href="/expat-community-centers-saudi" />
+              {getDynamicGuidesByCategory("Religion & Community").map(guide => (
+                <ServiceItem key={guide.id} title={guide.title} desc={guide.description} href={guide.href} isDynamic />
+              ))}
             </div>
           </section>
 
@@ -128,7 +169,7 @@ export default function GuideLibraryPage() {
   );
 }
 
-function ServiceItem({ title, desc, href }: { title: string, desc: string, href: string }) {
+function ServiceItem({ title, desc, href, isDynamic }: { title: string, desc: string, href: string, isDynamic?: boolean }) {
   return (
     <Link 
       href={href}
@@ -138,7 +179,7 @@ function ServiceItem({ title, desc, href }: { title: string, desc: string, href:
       <h3 className="text-xl font-bold text-slate-900 mb-3 group-hover:text-[#006C35] transition-colors">{title}</h3>
       <p className="text-slate-600 text-sm leading-relaxed mb-4 font-light">{desc}</p>
       <div className="flex items-center gap-2 text-xs font-bold text-[#006C35]">
-        Read Guide <CheckCircle2 size={14} />
+        {isDynamic ? "New Guide" : "Read Guide"} <CheckCircle2 size={14} />
       </div>
     </Link>
   );
