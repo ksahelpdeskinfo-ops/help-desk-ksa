@@ -11,6 +11,10 @@ interface Thread {
   author_name: string;
   author_email: string;
   created_at: string;
+  category?: string;
+  likes?: number;
+  author_avatar?: string;
+  replies?: any[];
 }
 
 export default function AdminDashboard() {

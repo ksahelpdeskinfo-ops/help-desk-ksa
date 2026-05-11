@@ -46,7 +46,7 @@ export default function CommunityChatPage() {
     fetchThreads();
 
     // Listen for auth changes (login/logout)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event: any, session: any) => {
       setUser(session?.user ?? null);
       if (_event === 'SIGNED_IN') fetchThreads();
     });
